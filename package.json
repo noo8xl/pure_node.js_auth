@@ -1,8 +1,8 @@
 {
   "name": "pure_nodejs_auth",
   "version": "1.0.0",
+  "author": "noo8xl <niko8elich@gmail.com>",
   "description": "Pure node.js authentication template. Use: mongodb as main db, redis as cache storage, telegram api for handling internal errors.",
-  "developer":"noo8xl <niko8elich@gmail.com>",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,7 +11,6 @@
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
