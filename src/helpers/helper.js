@@ -2,7 +2,7 @@ import crypto from "crypto"
 
 class Helper {
 
-  // GeneratePassword > generate unic code by userData <-
+  // GeneratePassword > generate unique code by userData <-
   // doc is here -> 
   // https://www.geeksforgeeks.org/node-js-crypto-createhash-method/
   async GeneratePassword(dto) {

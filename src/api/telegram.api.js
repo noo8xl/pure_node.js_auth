@@ -2,6 +2,7 @@ import { telegramApi } from "../config/config.js"
 import axios from 'axios'
 
 
+// Telegram -> handle errors and 2fa messages use telegram API
 export class Telegram {
   #TOKEN = telegramApi.token
   #ERR_CHAT_ID = telegramApi.chatId
@@ -14,16 +15,25 @@ export class Telegram {
     this.#MSG = dto.msg
   }
 
+  // SendErrorMsg -> send ONLY error messages to the developer CHAT_ID
   async SendErrorMsg(msg) {
     this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#ERR_CHAT_ID}&parse_mode=html&text=${encodeURI(msg)}`
     await this.#sendMessage()
   }
 
+  // SendUserMessage -> handle user messages as 2fa code, etc.
   async SendUserMessage(){
     this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#CHAT_ID}&parse_mode=html&text=${encodeURI(this.#MSG)}`
     await this.#sendMessage()
+    return
   }
 
+  
+  // #######################################################################
+  // ######################## private methods area #########################
+  // #######################################################################
+
+  // sendMessage -> send message with params to user via http
   async #sendMessage() {
     const config = {
       method: 'GET',

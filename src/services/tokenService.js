@@ -3,9 +3,13 @@ import DatabaseService from "./databaseService.js"
 import ApiError from "../exceptions/apiError.expt.js"
 import { jwtAuth } from "../config/config.js"
 
+// TokenService -> handle jwt-token logic
+// and create, save and validate auth token 
+// which come with request 
 class TokenService {
   #privateKey = jwtAuth.secret
 
+  // GenTokenPair -> generate new token pair by user DTO
   async GenTokenPair(payload) {
     let accessToken = "" 
     let refreshToken = ""
@@ -30,6 +34,7 @@ class TokenService {
     }
   } 
 
+  // ValidateToken -> validate user auth token 
   async ValidateToken(token){
     return jwt.verify(token, this.#privateKey, function(err,decode) {
       if(err) console.error("err =>", err );
@@ -38,6 +43,7 @@ class TokenService {
     })
   }
 
+  // FindToken -> find token in database 
   async FindToken(t){
     return await DatabaseService.FindToken(t)
   }

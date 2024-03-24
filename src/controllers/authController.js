@@ -5,6 +5,7 @@ import CacheService from "../services/cacheService.js"
 
 class AuthController {
 
+  // signUp -> registrate a new user
   async signUp(req, res, next) {
     const userDto = {
       userEmail: req.body.userEmail,
@@ -15,24 +16,26 @@ class AuthController {
     try {
       const init = new AuthService(userDto)
       await init.signUp()
-
-      return res.status(201).json({message: "ok"}).end()
     } catch (e) {
       next(e) 
-    }
+    } 
+    return res.status(201).json({message: "ok"}).end()
   }
 
+  
   async activateAccount(req, res, next){
     const activationLink = req.params.link
+    let result // <- boolean
 
     try {
       const init = new AuthService({activationLink})
-      const result = await init.activateAccount()
-
-      return res.status(202).json(result).end()
+      result = await init.activateAccount()
     } catch (e) {
       next(e) 
-    }
+    } 
+    if (!result) return res.status(400).end()
+    return res.status(202).end()
+    
   }
 
   async signIn(req, res, next){

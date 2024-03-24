@@ -17,7 +17,7 @@ router.post(
   AuthController.signUp
 )
 
-// activate account <-
+// activate account via generated link<-
 router.get(
   "/auth/activate/:link/",  
   AuthController.activateAccount

@@ -13,7 +13,7 @@ class DatabaseService {
   // and then return bool value <-
   async CheckTwoStepAuth(userEmail){
 
-    const userId = await this.#databaseFindRequest("User", userEmail, userEmail)
+    const userId = await this.#databaseFindRequest("User", "userEmail", userEmail)
     if (!userId) throw await ApiError.BadRequest()
 
     const result = await this.#databaseFindRequest("UserParams", "twoStepAuth", userId)
@@ -31,7 +31,7 @@ class DatabaseService {
     return true
   }
 
-  // CreateUser > insert data to db and return bool val <-
+  // CreateUser > insert data to db and return userId val <-
   async CreateUser(userDto) { 
     userDto.createdAt = new Date().getTime()
 
@@ -53,10 +53,12 @@ class DatabaseService {
       telegramId: 0, // int64 id here <-
     }
 
+    // create base user table
     const userId = await this.#databaseInsertRequest("User", userDto)
     resultId = userId
     params.userId = userId
     twoStepParams.userId = userId
+    // -> create user params table and next 2fa params table 
     await this.#databaseInsertRequest("UserParams", params)
     await this.#databaseInsertRequest("TwoStepParams", twoStepParams)
 
@@ -64,7 +66,7 @@ class DatabaseService {
   }
 
 
-
+  // ActivateUserAccount -> activate user account with activation link 
   async ActivateUserAccount(link) {
     const request = await this.#databaseFindRequest("UserParams", "activationLink", link)
     if(request.activationLink !== link) return false

@@ -1,5 +1,6 @@
-import { createClient } from 'redis'
+import {createClient} from 'redis'
 import ApiError from '../exceptions/apiError.expt.js';
+import {redisStore} from "../config/config.js"
 
 // the doc is -> 
 // https://redis.io/docs/connect/clients/nodejs/
@@ -70,16 +71,20 @@ class CacheService {
     //   }
     // });
 
-    // const url = conf.redis.url
-    // const client = createClient({
-    //   url
-    // });
-    const client = createClient();
+    const url = redisStore.url
+
+    const client = createClient({url})
 
     client.on('error', async function (err){
       throw await ApiError.ServerError("_redis_", err.message)
-    });
-    return await client.connect()
+    })
+    client.on('connect', () => console.log('Redis connected'))
+    client.on('reconnecting', () => console.log('Redis reconnecting'))
+      
+    
+    await client.connect()
+
+    return client
   }
 
 }
