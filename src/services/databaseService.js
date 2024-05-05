@@ -9,6 +9,20 @@ class DatabaseService {
 
   constructor(){}
 
+  // #####################################################################################
+
+  // #dbName -> is database name 
+  // #client -> is instance of connection 
+  // colName -> database collection name
+  // dto -> data transfer object (your data)
+  // fName -> filter object name (ex: {fName: "some value"})
+  // fVal -> filter object data  (ex: {someKey: fVal})
+  // uDoc -> object (document) with data which should be updated (ex: {userName: "some value"})
+  // filterData -> is object with some data (ex: {user: "test1", password: "pwd1", etc.})
+
+  // #####################################################################################
+
+
   // CheckTwoStepAuth > check is 2fa auth turned on
   // and then return bool value <-
   async CheckTwoStepAuth(userEmail){
@@ -88,10 +102,12 @@ class DatabaseService {
     return user 
   }
 
+  // UpdateUserPassword -> update user pwd by userId 
   async UpdateUserPassword(userId, userPassword) {
     return await this.#databaseUpdateRequest("User", {userId}, {userPassword})
   }
 
+  // SaveToken -> save auth token to db
   async SaveToken(userDto){
     return await this.#databaseInsertRequest("Token", userDto)
   }
@@ -101,6 +117,7 @@ class DatabaseService {
     return await this.#databaseFindRequest("Token", "refreshToken", t)
   }
 
+  // RemoveToken -> remove auth token
   async RemoveToken(t){
     return await this.#databaseDeleteRequest("Token", "refreshToken", t)
   }
@@ -109,14 +126,8 @@ class DatabaseService {
   // =================================== private method area ===================================//
   // ===========================================================================================//
 
-  
-  async #connect() {
-    this.#client = new MongoClient(this.#uri)
-    return
-  }
 
-
-  // =======================================
+  // databaseInsertRequest -> insert data to chosen collection
   async #databaseInsertRequest(colName, dto) {
     await this.#connect()
     const cl = this.#client 
@@ -135,6 +146,7 @@ class DatabaseService {
     return insId
   }
 
+  // databaseFindMultFilterRequest -> find one request with multifield obj to filter 
   async #databaseFindMultFilterRequest(colName, filterData) {
     await this.#connect()
     const cl = this.#client 
@@ -160,6 +172,7 @@ class DatabaseService {
     return result
   }
 
+  // databaseFindRequest -> find one by key:value
   async #databaseFindRequest(colName, fName, fVal) {
     await this.#connect()
     const cl = this.#client 
@@ -180,7 +193,7 @@ class DatabaseService {
     return result
   }
 
-  // databaseUpdateRequest -> update document 
+  // databaseUpdateRequest -> update document request
   async #databaseUpdateRequest(colName, fName, fVal, uDoc) {
     await this.#connect()
     const cl = this.#client 
@@ -203,6 +216,7 @@ class DatabaseService {
     return true
   }
 
+  // databaseDeleteRequest -> delete from db handler
   async #databaseDeleteRequest(colName, fName, fVal) {
     await this.#connect()
     const cl = this.#client 
@@ -224,6 +238,12 @@ class DatabaseService {
   }
 
   // =======================================
+
+  // connect -> connect to db and set a new client 
+  async #connect() {
+    this.#client = new MongoClient(this.#uri)
+    return
+  }
   
 }
 

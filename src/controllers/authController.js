@@ -22,7 +22,7 @@ class AuthController {
     return res.status(201).json({message: "ok"}).end()
   }
 
-  
+  // activateAccount -> validate link and change account status to activate 
   async activateAccount(req, res, next){
     const activationLink = req.params.link
     let result // <- boolean
@@ -38,6 +38,7 @@ class AuthController {
     
   }
 
+  // signIn -> handle login here
   async signIn(req, res, next){
 
     const userDto = {
@@ -84,6 +85,7 @@ class AuthController {
     }
   }
 
+  // forgotPassword -> forgot pwd handler
   async forgotPassword(req, res, next){
     const userEmail = req.params.userEmail
 
@@ -98,6 +100,7 @@ class AuthController {
   }
 
 
+  // refresh -> refresh user data for auth 
   async refresh(req, res, next){
     const token = req.cookies.refreshToken
 
@@ -118,6 +121,8 @@ class AuthController {
     }
   }
 
+
+  // logout -> remove tokens and terminate the user session
   async logout(req, res, next){
     const token = req.cookies.refreshToken
     const userId = req.params.userId

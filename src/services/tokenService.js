@@ -3,9 +3,9 @@ import DatabaseService from "./databaseService.js"
 import ApiError from "../exceptions/apiError.expt.js"
 import { jwtAuth } from "../config/config.js"
 
-// TokenService -> handle jwt-token logic
+// TokenService -> implements a jwt-token logic
 // and create, save and validate auth token 
-// which come with request 
+// which come with user request 
 class TokenService {
   #privateKey = jwtAuth.secret
 
@@ -28,10 +28,7 @@ class TokenService {
     }
 
     console.log("tokens =>\n", accessToken, "\n", refreshToken);
-    return {
-      accessToken,
-      refreshToken
-    }
+    return { accessToken,refreshToken }
   } 
 
   // ValidateToken -> validate user auth token 

@@ -8,8 +8,8 @@ async function ErrorHandler(area, txt) {
   await init.SendErrorMsg(msg)
 }
 
-// ApiError -> handle errors with response to the client 
-// and to the developer telegram
+// ApiError -> handle errors with response
+// to the client and to the developer telegram
 export default class ApiError extends Error {
   message
   status

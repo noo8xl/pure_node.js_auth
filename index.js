@@ -7,6 +7,7 @@ import router from "./src/router/index.js"
 
 const app = Express()
 const PORT = port
+const host = '127.0.0.1'
 const server = http.createServer(app)
 
 
@@ -19,4 +20,4 @@ app.disable('x-powered-by')
 // routers
 app.use('/api', router)
 
-server.listen(PORT, async() => {console.log(`server is running on ${PORT}`)})
+server.listen(PORT, async() => {console.log(`server is running on http://${host}:${PORT}`)})

@@ -18,6 +18,7 @@ class CacheService {
   // }
 
   // should update ?? < --
+  // ClearCahce -> clear user cache data by userId
   async ClearCahce(userID){
     const cl = await this.#connect()
     await cl.functionDelete(userID)
@@ -25,6 +26,7 @@ class CacheService {
     return
   }
 
+  // GetUserCache -> get user cached data by key
   async GetUserCache(key){
     const cl = await this.#connect()
 
@@ -36,6 +38,7 @@ class CacheService {
     return c
   }
 
+  // SetUserCache -> set user cache data obj to have a fast access to data
   async SetUserCache(userId, dto){
     const cl = await this.#connect()
     console.log("c dto =>\n",userId, "\n", dto);
@@ -43,19 +46,12 @@ class CacheService {
     await cl.disconnect();
     return
   }
+  
+  // #######################################################################################################
+  // ###################################### private area methods ###########################################
+  // #######################################################################################################
 
-  async SetParserCache(userID, payload){
-    const cl = await this.#connect()
-    await cl.hSet(userID, payload)
-
-    await cl.disconnect();
-    return
-  }
-
-
-
-
-
+  // connect -> connect to redis and create a new rdb client
   async #connect(){
 
     // const client = createClient({
@@ -72,18 +68,13 @@ class CacheService {
     // });
 
     const url = redisStore.url
-
     const client = createClient({url})
 
-    client.on('error', async function (err){
-      throw await ApiError.ServerError("_redis_", err.message)
-    })
+    client.on('error', async (err) => { throw await ApiError.ServerError("_redis_", err.message) })
     client.on('connect', () => console.log('Redis connected'))
     client.on('reconnecting', () => console.log('Redis reconnecting'))
       
-    
     await client.connect()
-
     return client
   }
 

@@ -23,6 +23,7 @@ export default class AuthService {
     this.#activationLink = userDto.activationLink
   }
 
+  // signUp -> registrate a new user 
   async signUp(){
 
     try {
@@ -43,10 +44,12 @@ export default class AuthService {
     return
   }
 
+  // activateAccount -> validate account activation link
   async activateAccount(){
     return await DatabaseService.ActivateUserAccount(this.#activationLink)
   }
 
+  // checkTwoStep -> check for 2fa auth user status 
   async checkTwoStep(){
     this.#twoStep = await DatabaseService.CheckTwoStepAuth(this.#userEmail)
     if(!this.#twoStep) return false
@@ -55,6 +58,7 @@ export default class AuthService {
     return this.#twoStep
   }
 
+  // getVerifiedTwoStepCode -> verified received 2fa code   
   async getVerifiedTwoStepCode() {
     return await DatabaseService.VerifiedCode(this.#twoStepCode, this.#userEmail)
   }
@@ -85,6 +89,7 @@ export default class AuthService {
     }
   }
 
+  // forgotPwd -> forgot password handler 
   async forgotPwd(){
     const user = await DatabaseService.GetUserByIdOrEmail(this.#userEmail)
     const tmp = await Helper.GeneratePassword(user.userPassword)
@@ -98,6 +103,7 @@ export default class AuthService {
     return await this.#clearToken()
   }
 
+  // refresh -> refresh is for renew actual user auth data
   async refresh() {
     let userDto = {}
     let user = {}
@@ -128,6 +134,7 @@ export default class AuthService {
     }
   }
 
+  // isHaveAccessToUse -> validate user role to grant access 
   async isHaveAccessToUse(){
     const c = await this.#isUserExists()
     if (!c) return false
@@ -136,11 +143,17 @@ export default class AuthService {
     return true
   }
 
+  // #######################################################################################################
+  // ###################################### private area methods ###########################################
+  // #######################################################################################################
+
+  // sendActivationEmail -> send activation link to user via email
   async #sendActivationEmail(){
     return await NotificationService.sendActivationMail(this.#userEmail, this.#activationLink)
   }
 
 
+  // createAndSendTwoStepCode -> generate new 2fa code and send it via email or telegram
   async #createAndSendTwoStepCode(){
     const user = await DatabaseService.GetUserByIdOrEmail(this.#userEmail)
     const tmp = await Helper.GeneratePassword(this.#userEmail)
@@ -155,14 +168,17 @@ export default class AuthService {
   }
 
 
+  // isUserExists -> check if user exsists 
   async #isUserExists(){ // return bool
     return await DatabaseService.GetUserByIdOrEmail(this.#userEmail)
   }
 
+  // isTokenAvailable -> validate token 
   async #isTokenAvailable(){ // return bool
     return await DatabaseService.ValidateToken(this.#token)
   }
 
+  // issueTokenPair -> generate auth token by user dto
   async #issueTokenPair(){
     let payload = {
       userEmail: this.#userEmail,
@@ -171,10 +187,13 @@ export default class AuthService {
     return await TokenService.GenTokenPair(payload)
   }
 
+  // validateToken -> validate auth token
   async #validateToken() {
     return await TokenService.ValidateToken(this.#token)
   }
 
+
+  // clearToken -> remove active user auth token
   async #clearToken(){
     return await DatabaseService.RemoveToken(this.#token)
   }

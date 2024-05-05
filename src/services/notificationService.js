@@ -1,6 +1,11 @@
 import * as nodemailer from 'nodemailer'
 import { emailCient, apiUrl } from '../config/config.js'
 
+// NotificationService -> implements email and 
+// telegram API notifications services.
+// here it is just a sample (it works), but it 
+// available to bit refactor to use via another repo
+// called <notification-api> -->  https://github.com/noo8xl/notification-api
 class NotificationService {
   #SMTP_HOST = emailCient.host
   #SMTP_PORT = emailCient.port

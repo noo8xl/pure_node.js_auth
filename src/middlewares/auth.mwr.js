@@ -1,6 +1,8 @@
 import ApiError from '../exceptions/apiError.expt.js'
 import TokenService from '../services/tokenService.js'
 
+
+// auth middleware -> handle access key to the api from client side
 export default async function (req, res, next) {
   const authorizationHeader = req.headers.authorization
   const accessToken = authorizationHeader.split(' ')[1]

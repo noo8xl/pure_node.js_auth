@@ -4,7 +4,7 @@ import AuthController from '../controllers/authController.js'
 const router = Router()
 
 // authChecker -> validate access auth token <- 
-import authChecker from "../middlewares/auth.mwr.js"
+import * as  authChecker from "../middlewares/auth.mwr.js"
 
 // ===========================================================================================//
 // ================================== handle auth endpoints ==================================//

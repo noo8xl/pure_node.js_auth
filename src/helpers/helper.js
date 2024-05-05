@@ -1,5 +1,7 @@
 import crypto from "crypto"
 
+
+// Helper -> help to do some actions like generate or sort some
 class Helper {
 
   // GeneratePassword > generate unique code by userData <-
@@ -11,6 +13,8 @@ class Helper {
       .digest('hex')
   }
 
+
+  // PrepareUserCacheData -> prepare regular userDto to redis obj
   async PrepareUserCacheData(dto, t){
     // copying <-
     let c = JSON.parse(JSON.stringify(dto))
@@ -22,6 +26,7 @@ class Helper {
 
     return c
   }
+  
 }
 
 export default new Helper();
