@@ -1,30 +1,31 @@
 import jwt from "jsonwebtoken"
 import DatabaseService from "./databaseService.js"
-import ApiError from "../exceptions/apiError.expt.js"
+import ErrorInterceptor from "../exceptions/ErrorInterceptor"
 import { jwtAuth } from "../config/config.js"
 
 // TokenService -> implements a jwt-token logic
 // and create, save and validate auth token 
 // which come with user request 
 class TokenService {
-  #privateKey = jwtAuth.secret
+  #secret = jwtAuth.secret
 
   // GenTokenPair -> generate new token pair by user DTO
   async GenTokenPair(payload) {
     let accessToken = "" 
     let refreshToken = ""
+
     try {
       accessToken = jwt.sign(
         payload, 
-        this.#privateKey, 
+        this.#secret, 
         {expiresIn: '30m'})
 
       refreshToken = jwt.sign(
         payload, 
-        this.#privateKey, 
+        this.#secret, 
         {expiresIn: '4h'})
     } catch (e) {
-      throw await ApiError.ServerError("_GenTokenPair_", e.message)
+      throw await ErrorInterceptor.ServerError("_GenTokenPair_", e.message)
     }
 
     console.log("tokens =>\n", accessToken, "\n", refreshToken);
@@ -33,9 +34,8 @@ class TokenService {
 
   // ValidateToken -> validate user auth token 
   async ValidateToken(token){
-    return jwt.verify(token, this.#privateKey, function(err,decode) {
+    return jwt.verify(token, this.#secret, function(err,decode) {
       if(err) console.error("err =>", err );
-      console.log("decode =>\n", decode);
       return decode
     })
   }

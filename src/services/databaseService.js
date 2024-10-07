@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import ApiError from '../exceptions/apiError.expt.js'
+import ApiError from '../exceptions/ErrorInterceptor.js'
 import { mongoDb } from '../config/config.js'
 
 class DatabaseService {

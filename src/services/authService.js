@@ -1,6 +1,6 @@
 import DatabaseService from "./databaseService.js"
 import TokenService from "./tokenService.js"
-import ApiError from "../exceptions/apiError.expt.js"
+import ApiError from "../exceptions/ErrorInterceptor.js"
 import Helper from "../helpers/helper.js"
 import NotificationService from "./notificationService.js"
 

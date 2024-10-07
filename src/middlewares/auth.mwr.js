@@ -1,4 +1,4 @@
-import ApiError from '../exceptions/apiError.expt.js'
+import ErrorInterceptor from "../exceptions/ErrorInterceptor"
 import TokenService from '../services/tokenService.js'
 
 
@@ -8,11 +8,11 @@ export default async function (req, res, next) {
   const accessToken = authorizationHeader.split(' ')[1]
   const isValid = await TokenService.ValidateToken(accessToken)
   try {
-    if (!authorizationHeader) return next(await ApiError.UnauthorizedError())
-    if (!accessToken) return next(await ApiError.UnauthorizedError())
-    if (!isValid) return next(await ApiError.UnauthorizedError())
+    if (!authorizationHeader) return next(ErrorInterceptor.UnauthorizedError())
+    if (!accessToken) return next(ErrorInterceptor.UnauthorizedError())
+    if (!isValid) return next(ErrorInterceptor.UnauthorizedError())
     next()
   } catch (e) {
-    return next(await ApiError.UnauthorizedError())
+    return next(ErrorInterceptor.UnauthorizedError())
   }
 }

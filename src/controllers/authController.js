@@ -1,3 +1,4 @@
+import ErrorInterceptor from "../exceptions/ErrorInterceptor.js"
 import Helper from "../helpers/helper.js"
 import AuthService from "../services/authService.js"
 import CacheService from "../services/cacheService.js"
@@ -7,6 +8,7 @@ class AuthController {
 
   // signUp -> registrate a new user
   async signUp(req, res, next) {
+
     const userDto = {
       userEmail: req.body.userEmail,
       userPassword: req.body.userPassword,
@@ -14,8 +16,7 @@ class AuthController {
     }
 
     try {
-      const init = new AuthService(userDto)
-      await init.signUp()
+      await new AuthService(userDto).signUp()
     } catch (e) {
       next(e) 
     } 
@@ -28,10 +29,9 @@ class AuthController {
     let result // <- boolean
 
     try {
-      const init = new AuthService({activationLink})
-      result = await init.activateAccount()
+      await new AuthService({activationLink}).activateAccount()
     } catch (e) {
-      next(e) 
+      throw await new ErrorInterceptor.defineAnError(e)
     } 
     if (!result) return res.status(400).end()
     return res.status(202).end()

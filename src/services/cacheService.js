@@ -1,5 +1,5 @@
 import {createClient} from 'redis'
-import ApiError from '../exceptions/apiError.expt.js';
+import ApiError from '../exceptions/ErrorInterceptor.js';
 import {redisStore} from "../config/config.js"
 
 // the doc is -> 

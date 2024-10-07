@@ -16,7 +16,7 @@ export class Telegram {
   }
 
   // SendErrorMsg -> send ONLY error messages to the developer CHAT_ID
-  async SendErrorMsg(msg) {
+  async SendErrorMsg() {
     this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#ERR_CHAT_ID}&parse_mode=html&text=${encodeURI(msg)}`
     await this.#sendMessage()
   }
