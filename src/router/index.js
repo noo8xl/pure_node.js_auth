@@ -4,7 +4,7 @@ import AuthController from '../controllers/authController.js'
 const router = Router()
 
 // authChecker -> validate access auth token <- 
-import * as  authChecker from "../middlewares/auth.mwr.js"
+import authChecker from "../middlewares/auth.mwr.js"
 
 // ===========================================================================================//
 // ================================== handle auth endpoints ==================================//
@@ -17,7 +17,7 @@ router.post(
   AuthController.signUp
 )
 
-// activate account via generated link<-
+// activate an account via a generated link<-
 router.get(
   "/auth/activate/:link/",  
   AuthController.activateAccount
@@ -29,7 +29,7 @@ router.post(
   AuthController.signIn
 )
 
-// forgot passord <-
+// forgot password <-
 router.get(
   "/auth/forgot-password/:userEmail/",  
   AuthController.forgotPassword
@@ -55,7 +55,7 @@ router.get(
 // test profile page <-
 router.get(
   "/profile/:userId/",
-  authChecker, 
+  // authChecker,
   UserController.profile
 )
 

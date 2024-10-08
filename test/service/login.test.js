@@ -1,9 +1,9 @@
-import AuthService from "../../src/services/authService"
-import { loginUserDto } from "../variables.test"
+import AuthService from "../../src/services/auth/authService.js"
+import { loginUserDto } from "../variables.test.js"
 
 let user = new AuthService(loginUserDto)
 
-// -> login service 
+// -> login service
 beforeEach(async ()=>{
   await userDetails.setUser(UserDetails)
   await userTwoStep.setUser(TwoStepParams)

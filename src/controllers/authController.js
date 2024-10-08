@@ -1,7 +1,7 @@
 import ErrorInterceptor from "../exceptions/ErrorInterceptor.js"
 import Helper from "../helpers/helper.js"
-import AuthService from "../services/authService.js"
-import CacheService from "../services/cacheService.js"
+import AuthService from "../services/auth/authService.js"
+import CacheService from "../services/cache/cacheService.js"
 
 
 class AuthController {
@@ -18,7 +18,7 @@ class AuthController {
     try {
       await new AuthService(userDto).signUp()
     } catch (e) {
-      next(e) 
+      throw await ErrorInterceptor.DefineAndCallAnError(e)
     } 
     return res.status(201).json({message: "ok"}).end()
   }
@@ -31,7 +31,7 @@ class AuthController {
     try {
       await new AuthService({activationLink}).activateAccount()
     } catch (e) {
-      throw await new ErrorInterceptor.defineAnError(e)
+      next(await ErrorInterceptor.DefineAndCallAnError(e))
     } 
     if (!result) return res.status(400).end()
     return res.status(202).end()
@@ -49,26 +49,21 @@ class AuthController {
 
     let isTwoStep = false
     let isValid = false
+    let twoFaMsg = "Two step turned on."
 
     try {
-      const init = new AuthService(userDto)
+      const service = new AuthService(userDto)
 
       if(userDto.twoStepCode !== "") {
         
-        isTwoStep = await init.checkTwoStep()
-        if (isTwoStep) return res
-          .status(200)
-          .json({message: "Two step turned on.",status: true})
-          .end()
+        isTwoStep = await service.checkTwoStep()
+        if (isTwoStep) return res.status(200).json({message: twoFaMsg,status: true}).end()
 
-        isValid = await init.getVerifiedTwoStepCode()
-        if (!isValid) return res
-          .status(400)
-          .json({message: "Wrong two step code."})
-          .end()
+        isValid = await service.getVerifiedTwoStepCode()
+        if (!isValid) throw ErrorInterceptor.BadRequest("Wrong two step code.")
       } 
 
-      const result = await init.signin()
+      const result = await service.signin()
       const c = await Helper.PrepareUserCacheData(result.user, result.tokens.refreshToken)      
       await CacheService.SetUserCache(c._id, c)
 
@@ -81,7 +76,7 @@ class AuthController {
 
       return res.status(200).json(result).end()
     } catch (e) {
-      next(e)
+      next(await ErrorInterceptor.DefineAndCallAnError(e))
     }
   }
 
@@ -90,13 +85,12 @@ class AuthController {
     const userEmail = req.params.userEmail
 
     try {
-      const init = new AuthService({userEmail})
-      await init.forgotPwd()
-
-      return res.status(200).end()
+      await new AuthService({userEmail}).forgotPwd()
     } catch (e) {
-      next(e)
+      next(await ErrorInterceptor.DefineAndCallAnError(e))
     }
+
+    return res.status(200).end()
   }
 
 
@@ -105,8 +99,7 @@ class AuthController {
     const token = req.cookies.refreshToken
 
     try {
-      const init = new AuthService({token})
-      const result = await init.refresh() 
+      const result = await new AuthService({token}).refresh() 
 
       res.cookie('refreshToken', result.tokens.refreshToken, {
         maxAge: 30 * 4 * 60 * 60 * 1000,
@@ -115,10 +108,10 @@ class AuthController {
         secure: true,
       })
 
-      return res.status(200).json(result).end()
     } catch (e) {  
-      next(e)
+      next(await ErrorInterceptor.DefineAndCallAnError(e))
     }
+    return res.status(200).json(result).end()
   }
 
 
@@ -126,26 +119,17 @@ class AuthController {
   async logout(req, res, next){
     const token = req.cookies.refreshToken
     const userId = req.params.userId
+    
     try {
-      const init = new AuthService({token})
-      await init.logout()
-
-      await CacheService.ClearCahce(userId)
+      await new AuthService({token}).logout()
+      await CacheService.ClearCustomerCahce(userId)
       await res.clearCookie('refreshToken')
 
-      return res.status(200).end()
     } catch (e) {
-      next(e)
+      next(await ErrorInterceptor.DefineAndCallAnError(e))
     }
+    return res.status(200).end()
   }
-
-  // =================================================
-  // =========== > helper handler below < ============
-  // =================================================
-
-  // async fun(params) {
-  //   return
-  // }
 }
 
 export default new AuthController();

@@ -3,6 +3,7 @@ config();
 
 export const version = '1.0.0,';
 export const port = process.env.PORT;
+export const host = process.env.HOST;
 export const apiUrl = process.env.API_URL;
 export const api = {
   host: process.env.API_HOST,
@@ -17,6 +18,7 @@ export const mongoDb = {
   uri: process.env.MONGO_DB_LINK,
   name: process.env.MONGO_DB_NAME,
 };
+
 export const mysqlDb = {
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_DB_USER,

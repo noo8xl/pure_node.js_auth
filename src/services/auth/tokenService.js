@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
-import DatabaseService from "./databaseService.js"
-import ErrorInterceptor from "../exceptions/ErrorInterceptor"
-import { jwtAuth } from "../config/config.js"
+import DatabaseService from "../database/databaseService.js"
+import ErrorInterceptor from "../../exceptions/ErrorInterceptor.js"
+import { jwtAuth } from "../../config/config.js"
 
 // TokenService -> implements a jwt-token logic
 // and create, save and validate auth token 

@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer'
-import { emailCient, apiUrl } from '../config/config.js'
-import { Telegram } from '../api/telegram.api.js'
+import { emailCient, apiUrl } from '../../config/config.js'
+import { Telegram } from '../../api/telegram.api.js'
 
 // NotificationService -> implements email and 
 // telegram API notifications services.
@@ -73,15 +73,13 @@ class NotificationService {
   }
 
   async send2faTelegramCode(chatId, code){
-    let tg = new Telegram({chatId, msg: code})
-    tg.SendUserMessage()
+    await new Telegram({chatId, msg: code}).SendUserMessage()
   }
 
   async sendTelegramErrorMessage(msg) {
-    let tg = new Telegram({chatId: null, msg: code})
-    tg.SendErrorMsg()
+    await new Telegram({chatId: null, msg: code}).SendErrorMsg()
   }
 
 }
 
-export default new NotificationService();
+export default NotificationService;

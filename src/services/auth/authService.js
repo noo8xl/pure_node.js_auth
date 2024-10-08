@@ -1,8 +1,8 @@
-import DatabaseService from "./databaseService.js"
+import DatabaseService from "../database/databaseService.js"
 import TokenService from "./tokenService.js"
-import ApiError from "../exceptions/ErrorInterceptor.js"
-import Helper from "../helpers/helper.js"
-import NotificationService from "./notificationService.js"
+import ApiError from "../../exceptions/ErrorInterceptor.js"
+import Helper from "../../helpers/helper.js"
+import NotificationService from "../notification/notificationService.js"
 
 export default class AuthService {
   #userName

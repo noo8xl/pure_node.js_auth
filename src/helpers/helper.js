@@ -1,6 +1,6 @@
 import {scrypt} from "crypto"
 import { jwtAuth } from "../config/config.js"
-import ErrorInterceptor from "../exceptions/ErrorInterceptor"
+import ErrorInterceptor from "../exceptions/ErrorInterceptor.js"
 
 
 // Helper -> help to do some actions like generate or sort some

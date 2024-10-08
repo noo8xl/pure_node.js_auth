@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb'
-import ApiError from '../exceptions/ErrorInterceptor.js'
-import { mongoDb } from '../config/config.js'
+import ApiError from '../../exceptions/ErrorInterceptor.js'
+import { mongoDb } from '../../config/config.js'
+import ErrorInterceptor from '../../exceptions/ErrorInterceptor.js'
 
 class DatabaseService {
   #uri = mongoDb.uri
@@ -36,7 +37,9 @@ class DatabaseService {
   }
 
   async GetTwoStepParams(userId){
-    return await this.#databaseFindRequest("TwoStepParams", userId, userId)
+    let res = await this.#databaseFindRequest("TwoStepParams", userId, userId)
+	  res.catch(console.error)
+	  return res
   } 
 
   async VerifiedCode(userEmail, code){
@@ -48,6 +51,8 @@ class DatabaseService {
   // CreateUser > insert data to db and return userId val <-
   async CreateUser(userDto) { 
     userDto.createdAt = new Date().getTime()
+
+	  console.log('test ->>>>>>>....')
 
     let resultId = ""
 
@@ -67,7 +72,7 @@ class DatabaseService {
       telegramId: 0, // int64 id here <-
     }
 
-    // create base user table
+    // create a base user table
     const userId = await this.#databaseInsertRequest("User", userDto)
     resultId = userId
     params.userId = userId
@@ -92,14 +97,14 @@ class DatabaseService {
 
   // GetUserByIdOrEmail > find user by id OR email 
   // and return user object OR bool false value <-
-  async GetUserByIdOrEmail(str){ 
+  async GetUserByIdOrEmail(str){
     let user = {}
 
     !str.includes("@")
       ? user = await this.#databaseFindRequest("User", "_id", str)
       : user = await this.#databaseFindRequest("User", "userEmail", str)
 
-    return user 
+    return user
   }
 
   // UpdateUserPassword -> update user pwd by userId 
@@ -132,14 +137,14 @@ class DatabaseService {
     await this.#connect()
     const cl = this.#client 
     const database = cl.db(this.#db_name)
-    const colection = database.collection(colName)
+    const collection = database.collection(colName)
     let insId = ""
 
     try {
-      let result = await colection.insertOne(dto)
+      let result = await collection.insertOne(dto)
       insId = result.insertedId.toString()
     } catch (e) {
-      throw await ApiError.ServerError("_db_DatabaseInsertRequest", e.message)
+      throw await ErrorInterceptor.ServerError("_db_DatabaseInsertRequest: " + e.message)
     } finally {
       await cl.close()
     }
@@ -151,24 +156,24 @@ class DatabaseService {
     await this.#connect()
     const cl = this.#client 
     const database = cl.db(this.#db_name)
-    const colection = database.collection(colName)
+    const collection = database.collection(colName)
 
     let filter = {}
     let keyList = Object.keys(filterData)
-    let valuetList = Object.values(filterData)
+    let valuesList = Object.values(filterData)
     
     for (let i = 0; i <= keyList.length -1; i++)
-      filter[keyList[i]] = valuetList[i]
+      filter[keyList[i]] = valuesList[i]
     
     let result = {}
     try {
-      result = await colection.findOne(filter)
+      result = await collection.findOne(filter)
     } catch (e) {
-      throw await ApiError.ServerError("_db_DatabaseFindMultFilterRequest", e.message)
+      throw await ErrorInterceptor.ServerError("_db_DatabaseFindMultFilterRequest", e.message)
     } finally {
       await cl.close()
     }
-    if (!result) throw await ApiError.BadRequest()
+    if (!result) throw ErrorInterceptor.ExpectationFailed()
     return result
   }
 
@@ -177,19 +182,18 @@ class DatabaseService {
     await this.#connect()
     const cl = this.#client 
     const database = cl.db(this.#db_name)
-    const colection = database.collection(colName)
+    const collection = database.collection(colName)
     let filter = {}
     let result = {}
     filter[fName] = fVal
 
     try {
-      result = await colection.findOne(filter)
+      result = await collection.findOne(filter)
     } catch (e) {
-      throw await ApiError.ServerError("_db_DatabaseFindRequest", e.message)
+      throw await ErrorInterceptor.ServerError("_db_DatabaseFindRequest", e.message)
     } finally {
       await cl.close()
     }
-    if (!result) throw await ApiError.BadRequest()
     return result
   }
 
@@ -198,21 +202,21 @@ class DatabaseService {
     await this.#connect()
     const cl = this.#client 
     const database = cl.db(this.#db_name)
-    const colection = database.collection(colName)
+    const collection = database.collection(colName)
     let filter = {}
     let result
     filter[fName] = fVal
     const updatedDoc = {$set: uDoc}
 
     try {
-      result = await colection.updateOne(filter, updatedDoc)
+      result = await collection.updateOne(filter, updatedDoc)
       console.log("result.modifiedCount => ", result.modifiedCount);
     } catch (e) {
-      throw await ApiError.ServerError("_db_DatabaseUpdateRequest", e.message)
+      throw await ErrorInterceptor.ServerError("_db_DatabaseUpdateRequest", e.message)
     } finally {
       await cl.close()
     }
-    if (result.modifiedCount < 1) throw await ApiError.BadRequest()
+    if (result.modifiedCount < 1) throw ErrorInterceptor.ExpectationFailed()
     return true
   }
 
@@ -221,19 +225,19 @@ class DatabaseService {
     await this.#connect()
     const cl = this.#client 
     const database = cl.db(this.#db_name)
-    const colection = database.collection(colName)
+    const collection = database.collection(colName)
     let filter = {}
     let result = {}
     filter[fName] = fVal
 
     try {
-      result = await colection.deleteOne(filter)
+      result = await collection.deleteOne(filter)
     } catch (e) {
-      throw await ApiError.ServerError("_db_DatabaseDeleteRequest", e.message)
+      throw await ErrorInterceptor.ServerError("_db_DatabaseDeleteRequest", e.message)
     } finally {
       await cl.close()
     }
-    if (!result) throw await ApiError.BadRequest()
+    if (!result) throw ErrorInterceptor.ExpectationFailed()
     return true
   }
 
@@ -242,7 +246,6 @@ class DatabaseService {
   // connect -> connect to db and set a new client 
   async #connect() {
     this.#client = new MongoClient(this.#uri)
-    return
   }
   
 }
