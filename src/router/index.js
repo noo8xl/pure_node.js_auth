@@ -5,6 +5,7 @@ const router = Router()
 
 // authChecker -> validate access auth token <- 
 import authChecker from "../middlewares/auth.mwr.js"
+import {GetCachedProfile} from "../middlewares/getCachedData.mwr.js";
 
 // ===========================================================================================//
 // ================================== handle auth endpoints ==================================//
@@ -18,7 +19,7 @@ router.post(
 )
 
 // activate an account via a generated link<-
-router.get(
+router.patch(
   "/auth/activate/:link/",  
   AuthController.activateAccount
 )
@@ -30,20 +31,14 @@ router.post(
 )
 
 // forgot password <-
-router.get(
+router.patch(
   "/auth/forgot-password/:userEmail/",  
   AuthController.forgotPassword
 )
 
-// refresh <-
-router.get(
-  "/auth/refresh/",  
-  AuthController.refresh
-)
-
 // logout <-
 router.get(
-  "/auth/logout/:userId/",  
+  "/auth/logout/:userId/",
   AuthController.logout
 )
 
@@ -55,7 +50,8 @@ router.get(
 // test profile page <-
 router.get(
   "/profile/:userId/",
-  // authChecker,
+  authChecker,
+	GetCachedProfile,
   UserController.profile
 )
 

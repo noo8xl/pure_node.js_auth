@@ -4,105 +4,80 @@ import {redisStore} from "../../config/config.js"
 
 // the doc is -> 
 // https://redis.io/docs/connect/clients/nodejs/
-// <- 
-class CacheService {
-
+export class CacheService {
   #client;
 
-  // the cache is ==== >
-  // = > userDto is Object with :
-  //  {
-  //   userEmail: req.body.userEmail,
-  //   userPassword: req.body.userPassword,
-  //   twoStepCode: req.body.twoStepCode,
-  //   token: "string",
-  //   action: "string"
-  // }
+	constructor() {}
 
-
-
-  // should update ?? < --
-  // ClearCahce -> clear user cache data by userId
-  async ClearCahce(userID){
-    try {
-      
+  // ClearCache -> clear user cache data by userId
+  async ClearCache(userId){
+		try {
       await this.#connect()
-      await cl.functionDelete(userID)
+			await this.#client.del(userId)
 
     } catch (e) {
-      throw ErrorInterceptor.DefineAndCallAnError(e)
+      throw ErrorInterceptor.ExpectationFailed(e.message)
     } finally {
-      await cl.disconnect();
+      await this.#client.disconnect();
     }
   }
 
   // GetUserCache -> get user cached data by key
   async GetUserCache(key){
-    let c = {}
-
     try {
       await this.#connect()
-    
-      const temp = await this.#client.hGetAll(key);
-      c = JSON.parse(JSON.stringify(temp, null, 2))
-  
-      console.log("user cache is\n=> ", c);
-      
-    } catch (e) {
-      throw ErrorInterceptor.DefineAndCallAnError(e)
-    } finally {
-      await cl.disconnect();
-    }
 
-    return c
+      const obj = await this.#client.hGetAll(key);
+      return  JSON.parse(JSON.stringify(obj, null, 2))
+
+    } catch (e) {
+      throw ErrorInterceptor.ExpectationFailed(e.message)
+    } finally {
+      await this.#client.disconnect();
+    }
   }
 
   // SetUserCache -> set user cache data obj to have a fast access to data
   async SetUserCache(userId, dto){
-    console.log("c dto =>\n",userId, "\n", dto);
+
+		let data = this.#prepareCacheData(dto)
 
     try {
       await this.#connect()
-      await this.#client.hSet(userId, dto)
+      await this.#client.hSet(userId, data,'PX', 1_800_000) // will be expired in 30 min
       
     } catch (e) {
-      throw ErrorInterceptor.DefineAndCallAnError(e)
+      throw ErrorInterceptor.ExpectationFailed(e.message)
     } finally {
-      await cl.disconnect();
+      await this.#client.disconnect();
     }
   }
   
   // #######################################################################################################
-  // ###################################### private area methods ###########################################
+  // ########################################### private area ##############################################
   // #######################################################################################################
+
+
+	#prepareCacheData(dto){
+		let map = new Map()
+		for (let i = 0; i < Object.keys(dto).length; i++)
+			map.set(`${Object.keys(dto)[i]}`, `${Object.values(dto)[i]}`)
+		return map;
+	}
 
   // connect -> connect to redis and create a new rdb client
   async #connect(){
 
-    // const client = createClient({
-    //   username: 'default', // use your Redis user. More info https://redis.io/docs/management/security/acl/
-    //   password: 'secret', // use your password here
-    //   socket: {
-    //       host: 'my-redis.cloud.redislabs.com',
-    //       port: 6379,
-    //       tls: true,
-    //       key: readFileSync('./redis_user_private.key'),
-    //       cert: readFileSync('./redis_user.crt'),
-    //       ca: [readFileSync('./redis_ca.pem')]
-    //   }
-    // });
-
     const url = redisStore.url
     const client = createClient({url})
 
-    client.on('error', async (err) => { throw await ErrorInterceptor.ServerError("_redis_", err.message) })
+    client.on('error', async (err) => { throw await ErrorInterceptor.ServerError("_redis_ "+ err.message) })
     client.on('connect', () => console.log('Redis connected'))
     client.on('reconnecting', () => console.log('Redis reconnecting'))
+	  client.on('end', () => console.log('Redis disconnected'))
       
     await client.connect()
     this.#client = client
   }
 
 }
-
-export default new CacheService();

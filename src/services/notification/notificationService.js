@@ -1,5 +1,5 @@
 import * as nodemailer from 'nodemailer'
-import { emailCient, apiUrl } from '../../config/config.js'
+import { emailClient, apiUrl } from '../../config/config.js'
 import { Telegram } from '../../api/telegram.api.js'
 
 // NotificationService -> implements email and 
@@ -7,14 +7,13 @@ import { Telegram } from '../../api/telegram.api.js'
 // here it is just a sample (it works), but it 
 // available to bit refactor to use via another repo
 // called <notification-api> -->  https://github.com/noo8xl/notification-api
-class NotificationService {
-  #SMTP_HOST = emailCient.host
-  #SMTP_PORT = emailCient.port
-  #SMTP_USER =  emailCient.user
-  #SMTP_PASSWORD = emailCient.password
-  #API_URL = apiUrl
+
+export class NotificationService {
+  #SMTP_HOST = emailClient.host
+  #SMTP_PORT = emailClient.port
+  #SMTP_USER =  emailClient.user
+  #SMTP_PASSWORD = emailClient.password
   #transporter
-  #telegramAPI
 
   constructor() {
     this.#transporter = nodemailer.createTransport({
@@ -29,47 +28,45 @@ class NotificationService {
   }
 
   async sendActivationMail(to, link) {
-    await this.#transporter.sendMail({
-      from: this.#SMTP_USER,
-      to: to,
-      subject: 'Account activation',
-      text: '',
-      html:
-        `
-          <div>
-            <h1>Click to activate: </h1>
-            <a href='${link}'>${link}</a>
-          </div>
-        `
-    })
-    this.#transporter
-      .verify()
-      .then(console.log)
-      .catch(console.error);
-
-    return
+	  console.log(`sent email to ${to}: ${link}`);
+    // await this.#transporter.sendMail({
+    //   from: this.#SMTP_USER,
+    //   to: to,
+    //   subject: 'Account activation',
+    //   text: '',
+    //   html:
+    //     `
+    //       <div>
+    //         <h1>Click to activate: </h1>
+    //         <a href='${link}'>${link}</a>
+    //       </div>
+    //     `
+    // })
+    // this.#transporter
+    //   .verify()
+    //   .then(console.log)
+    //   .catch(console.error);
   }
 
-  async send2faEmailCode(email, code){
-    await this.#transporter.sendMail({
-      from: this.#SMTP_USER,
-      to: email,
-      subject: 'Authentication',
-      text: '',
-      html:
-        `
-          <div>
-            <h1>Authentication code: </h1>
-            <div>${code}</div>
-          </div>
-        `
-    })
-    this.#transporter
-    .verify()
-    .then(console.log)
-    .catch(console.error);
-
-    return
+  async send2faEmailCode(to, code){
+	  console.log(`sent email to ${to}: ${code}`);
+    // await this.#transporter.sendMail({
+    //   from: this.#SMTP_USER,
+    //   to: email,
+    //   subject: 'Authentication',
+    //   text: '',
+    //   html:
+    //     `
+    //       <div>
+    //         <h1>Authentication code: </h1>
+    //         <div>${code}</div>
+    //       </div>
+    //     `
+    // })
+    // this.#transporter
+    // .verify()
+    // .then(console.log)
+    // .catch(console.error);
   }
 
   async send2faTelegramCode(chatId, code){
@@ -77,8 +74,12 @@ class NotificationService {
   }
 
   async sendTelegramErrorMessage(msg) {
-    await new Telegram({chatId: null, msg: code}).SendErrorMsg()
+    await new Telegram({chatId: null, msg}).SendErrorMsg()
   }
+
+
+
+
 
 }
 

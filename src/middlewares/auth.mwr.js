@@ -1,19 +1,16 @@
-import ErrorInterceptor from "../exceptions/ErrorInterceptor.js"
-import TokenService from '../services/auth/tokenService.js'
+import {TokenService} from '../services/auth/tokenService.js'
 
-
-// auth middleware -> handle access key to the api from client side
+// auth middleware -> handle an access key to the api from the client side
 export default async function authChecker(req, res, next) {
-  const authorizationHeader = req.headers.authorization
-  const accessToken = authorizationHeader.split(' ')[1]
-  try {
-    if (!authorizationHeader) return next(ErrorInterceptor.UnauthorizedError())
-    if (!accessToken) return next(ErrorInterceptor.UnauthorizedError())
-    if (!isValid) return next(ErrorInterceptor.UnauthorizedError())
+	if (!req.headers.authorization) return res.status(401).send('No auth headers provided')
 
-    const isValid = await TokenService.ValidateToken(accessToken)
+	const authorizationHeader = req.headers.authorization
+	const accessToken = authorizationHeader.split(' ')[1]
+
+	try {
+    await new TokenService().ValidateToken(accessToken)
     next()
   } catch (e) {
-    return next(ErrorInterceptor.UnauthorizedError())
+		next(e.message)
   }
 }

@@ -36,7 +36,7 @@ export const redisStore = {
   // cert: readFileSync('./redis_user.crt'),
   // ca: [readFileSync('./redis_ca.pem')]
 };
-export const emailCient = {
+export const emailClient = {
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   user: process.env.SMTP_USER,

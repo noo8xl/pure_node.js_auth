@@ -1,15 +1,20 @@
 import jwt from "jsonwebtoken"
-import DatabaseService from "../database/databaseService.js"
 import ErrorInterceptor from "../../exceptions/ErrorInterceptor.js"
-import { jwtAuth } from "../../config/config.js"
+import {jwtAuth} from "../../config/config.js"
+import {DatabaseService} from "../database/databaseService.js";
 
 // TokenService -> implements a jwt-token logic
-// and create, save and validate auth token 
-// which come with user request 
-class TokenService {
+// and creates saves and validate auth token
+// which comes with a user request
+export class TokenService {
   #secret = jwtAuth.secret
+	#db
 
-  // GenTokenPair -> generate new token pair by user DTO
+	constructor() {
+		this.#db = new DatabaseService();
+	}
+
+	// GenTokenPair -> generate new token pair by user DTO
   async GenTokenPair(payload) {
     let accessToken = "" 
     let refreshToken = ""
@@ -24,26 +29,23 @@ class TokenService {
         payload, 
         this.#secret, 
         {expiresIn: '4h'})
+
+	    return { accessToken,refreshToken }
     } catch (e) {
       throw await ErrorInterceptor.ServerError("_GenTokenPair_", e.message)
     }
-
-    console.log("tokens =>\n", accessToken, "\n", refreshToken);
-    return { accessToken,refreshToken }
   } 
 
   // ValidateToken -> validate user auth token 
   async ValidateToken(token){
-    return jwt.verify(token, this.#secret, function(err,decode) {
-      if(err) console.error("err =>", err );
-      return decode
+    await jwt.verify(token, this.#secret, function(err, decode) {
+      if(err) throw ErrorInterceptor.ExpectationFailed(err);
+      console.log('decoded token is -> ', decode);
     })
   }
 
-  // FindToken -> find token in database 
+  // FindToken -> find token in database
   async FindToken(t){
-    return await DatabaseService.FindToken(t)
+    return await this.#db.FindToken(t)
   }
 }
-
-export default new TokenService();

@@ -17,7 +17,7 @@ export class Telegram {
 
   // SendErrorMsg -> send ONLY error messages to the developer CHAT_ID
   async SendErrorMsg() {
-    this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#ERR_CHAT_ID}&parse_mode=html&text=${encodeURI(msg)}`
+    this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#ERR_CHAT_ID}&parse_mode=html&text=${encodeURI(this.#MSG)}`
     await this.#sendMessage()
   }
 
@@ -25,7 +25,6 @@ export class Telegram {
   async SendUserMessage(){
     this.url = `https://api.telegram.org/bot${this.#TOKEN}/sendMessage?chat_id=${this.#CHAT_ID}&parse_mode=html&text=${encodeURI(this.#MSG)}`
     await this.#sendMessage()
-    return
   }
 
   
@@ -33,11 +32,11 @@ export class Telegram {
   // ######################## private methods area #########################
   // #######################################################################
 
-  // sendMessage -> send message with params to user via http
+  // sendMessage -> send a message with params to the user via http
   async #sendMessage() {
     const config = {
       method: 'GET',
-      data: msg,
+      data: this.#MSG,
       responseType: 'stream'
     }
 
